@@ -33,7 +33,7 @@ class MessageHandler:
         try:
             self._state.handle_order_info(order_info)
             if self._strategy is not None:
-                self._strategy.remove_pending_order(order_info)
+                self._strategy.handle_order_info(order_info)
         finally:
             self.__lock.release()
 

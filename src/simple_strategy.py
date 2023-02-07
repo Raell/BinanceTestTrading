@@ -31,7 +31,7 @@ class SimpleStrategy:
     def process_strategy(self) -> None:
         self.__update_orders()
 
-    def remove_pending_order(self, order_info: OrderInfo) -> None:
+    def handle_order_info(self, order_info: OrderInfo) -> None:
         self.__lock.acquire()
         try:
             # Handle new order
