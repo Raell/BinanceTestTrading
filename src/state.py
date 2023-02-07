@@ -27,7 +27,7 @@ class State:
     def __init__(self, symbol, asset):
         self._symbol = symbol
         self._asset = asset
-        self._balance = None
+        self._balance = 0
         self._open_orders = []
         self._top_market = {}
         self.__lock = threading.Lock()
