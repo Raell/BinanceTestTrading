@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+python = "env PYTHONPATH=src python"
+test = "env PYTHONPATH=src pytest"
+fmt = "bash -c 'pipenv run fmt:black; pipenv run fmt:isort'"
+"fmt:black" = "black src tests"
+"fmt:isort" = "isort --src=src src tests"
+"fmt-check" = "bash -c 'pipenv run fmt-check:black; pipenv run fmt-check:isort'"
+"fmt-check:black" = "black --check src tests"
+"fmt-check:isort" = "isort --check --src=src src tests"
+
+[packages]
+cryptofeed = "*"
+
+[dev-packages]
+pytest = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true
