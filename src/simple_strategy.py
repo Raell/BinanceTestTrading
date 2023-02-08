@@ -10,12 +10,13 @@ from cryptofeed.defines import BUY, SELL
 from cryptofeed.exchange import RestExchange
 from cryptofeed.types import OrderInfo
 
-from order import order_from_order_info, Order, cancel_order, send_order
-from state import State, BookSide
+from order import Order, cancel_order, order_from_order_info, send_order
+from state import BookSide, State
 
 SIZE = 0.01
 PRICE_OFFSET = 10
 EXPECTED_ORDERS_PER_SIDE = 2
+
 
 class SimpleStrategy:
     def __init__(self, exchange: RestExchange, state: State, balance_limit: float):
@@ -37,8 +38,10 @@ class SimpleStrategy:
             # Handle new order
             if order_info.status == "NEW":
                 order = order_from_order_info(order_info)
-                print(f"New OrderId({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
-                      f"Size({order.size}), Price({order.price})")
+                print(
+                    f"New OrderId({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
+                    f"Size({order.size}), Price({order.price})"
+                )
                 try:
                     self.__pending_orders.remove(order)
                 except ValueError:
@@ -47,8 +50,10 @@ class SimpleStrategy:
             # Handle cancelled order
             if order_info.status == "CANCELED":
                 order = order_from_order_info(order_info)
-                print(f"Cancelled OrderId({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
-                      f"Size({order.size}), Price({order.price})")
+                print(
+                    f"Cancelled OrderId({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
+                    f"Size({order.size}), Price({order.price})"
+                )
                 try:
                     self.__pending_cancels.remove(order)
                 except ValueError:
@@ -57,8 +62,10 @@ class SimpleStrategy:
             # Handle trade
             if order_info.status == "TRADE":
                 order = order_from_order_info(order_info)
-                print(f"Traded OrderId({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
-                      f"Size({order.size}), Price({order.price})")
+                print(
+                    f"Traded OrderId({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
+                    f"Size({order.size}), Price({order.price})"
+                )
                 self.__pull_orders(self._state.open_orders)
         finally:
             self.__lock.release()
@@ -86,12 +93,20 @@ class SimpleStrategy:
                 print("Has pending orders, doing nothing.")
                 return
 
-            if not bid_orders and self.__bid_enabled and self.__is_inventory_within_limit(BUY):
+            if (
+                not bid_orders
+                and self.__bid_enabled
+                and self.__is_inventory_within_limit(BUY)
+            ):
                 print("Inserting new bid orders.")
                 orders = self.__create_orders(BUY, best_bid[0])
                 self.__insert_orders(orders)
 
-            if not ask_orders and self.__ask_enabled and self.__is_inventory_within_limit(SELL):
+            if (
+                not ask_orders
+                and self.__ask_enabled
+                and self.__is_inventory_within_limit(SELL)
+            ):
                 print("Inserting new ask orders.")
                 orders = self.__create_orders(SELL, best_ask[0])
                 self.__insert_orders(orders)
@@ -114,23 +129,26 @@ class SimpleStrategy:
     def __insert_orders(self, orders: List[Order]) -> None:
         for order in orders:
             self.__pending_orders.append(order)
-            task = asyncio.ensure_future(send_order(exchange=self._exchange, order=order))
-            task.add_done_callback(functools.partial(self.__order_insert_callback, order))
+            task = asyncio.ensure_future(
+                send_order(exchange=self._exchange, order=order)
+            )
+            task.add_done_callback(
+                functools.partial(self.__order_insert_callback, order)
+            )
 
     def __create_orders(self, side: str, best_price: Decimal) -> List[Order]:
         next_level_offset = PRICE_OFFSET if side == SELL else -PRICE_OFFSET
 
         top_market_order = Order(
-            symbol=self._state.symbol,
-            side=side,
-            size=SIZE,
-            price=best_price)
+            symbol=self._state.symbol, side=side, size=SIZE, price=best_price
+        )
 
         next_level_order = Order(
             symbol=self._state.symbol,
             side=side,
             size=SIZE,
-            price=best_price + next_level_offset)
+            price=best_price + next_level_offset,
+        )
 
         return [top_market_order, next_level_order]
 
@@ -139,19 +157,21 @@ class SimpleStrategy:
             if order not in self.__pending_cancels:
                 self.__pending_cancels.append(order)
                 task = asyncio.ensure_future(cancel_order(self._exchange, order))
-                task.add_done_callback(functools.partial(self.__order_cancel_callback, order))
+                task.add_done_callback(
+                    functools.partial(self.__order_cancel_callback, order)
+                )
 
     def __should_orders_be_pulled(
-            self,
-            side: str,
-            open_orders: List[Order],
-            top_level: Tuple[Decimal, Decimal]) -> bool:
+        self, side: str, open_orders: List[Order], top_level: Tuple[Decimal, Decimal]
+    ) -> bool:
         if not open_orders:
             return False
         if not self.__is_inventory_within_limit(side):
             return True
 
-        return not self.__order_exists_at_top_level_and_not_alone(open_orders, top_level)
+        return not self.__order_exists_at_top_level_and_not_alone(
+            open_orders, top_level
+        )
 
     def __is_inventory_within_limit(self, side: str) -> bool:
         # Inventory management, pull orders on side if exceeded
@@ -164,7 +184,9 @@ class SimpleStrategy:
             return self.__ask_enabled
 
     @staticmethod
-    def __order_exists_at_top_level_and_not_alone(open_orders: List[Order], top_level: Tuple[Decimal, Decimal]) -> bool:
+    def __order_exists_at_top_level_and_not_alone(
+        open_orders: List[Order], top_level: Tuple[Decimal, Decimal]
+    ) -> bool:
         # Checks if top level is empty
         if not top_level:
             return False

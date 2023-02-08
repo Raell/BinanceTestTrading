@@ -1,9 +1,9 @@
 import threading
 
-from cryptofeed.types import OrderBook, Position, OrderInfo
+from cryptofeed.types import OrderBook, OrderInfo, Position
 
-from state import State
 from simple_strategy import SimpleStrategy
+from state import State
 
 
 class MessageHandler:
@@ -28,7 +28,9 @@ class MessageHandler:
         finally:
             self.__lock.release()
 
-    async def order_info_handler(self, order_info: OrderInfo, receipt_timestamp) -> None:
+    async def order_info_handler(
+        self, order_info: OrderInfo, receipt_timestamp
+    ) -> None:
         self.__lock.acquire()
         try:
             self._state.handle_order_info(order_info)

@@ -1,9 +1,10 @@
 import threading
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
-from cryptofeed.types import OrderBook, Position, OrderInfo
+from cryptofeed.types import OrderBook, OrderInfo, Position
+
 from order import Order, order_from_order_info
 
 

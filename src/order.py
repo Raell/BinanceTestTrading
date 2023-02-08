@@ -15,12 +15,8 @@ class Order:
     order_id: str
 
     def __init__(
-            self,
-            symbol: str,
-            side: str,
-            size: float,
-            price: Decimal,
-            order_id: str = None):
+        self, symbol: str, side: str, size: float, price: Decimal, order_id: str = None
+    ):
         self._symbol = symbol
         self._side = side
         self._size = size
@@ -51,10 +47,12 @@ class Order:
         if not isinstance(other, Order):
             return NotImplemented
 
-        return self.symbol == other.symbol and \
-               self.side == other.side and \
-               self.size == other.size and \
-               self.price == other.price
+        return (
+            self.symbol == other.symbol
+            and self.side == other.side
+            and self.size == other.size
+            and self.price == other.price
+        )
 
 
 def order_from_order_info(order_info: OrderInfo) -> Order:
@@ -63,29 +61,31 @@ def order_from_order_info(order_info: OrderInfo) -> Order:
         side=order_info.side,
         size=float(order_info.amount),
         price=Decimal(order_info.raw["o"]["p"]),
-        order_id=order_info.id)
+        order_id=order_info.id,
+    )
 
 
-async def send_order(
-        exchange: RestExchange,
-        order: Order) -> None:
-    print(f"Sending order for Symbol({order.symbol}), Side({order.side}), "
-          f"Size({float(order.size)}), Price({order.price}).")
+async def send_order(exchange: RestExchange, order: Order) -> None:
+    print(
+        f"Sending order for Symbol({order.symbol}), Side({order.side}), "
+        f"Size({float(order.size)}), Price({order.price})."
+    )
     await exchange.place_order(
         symbol=order.symbol,
         side=order.side,
         order_type=LIMIT,
         amount=float(order.size),
         price=order.price,
-        time_in_force=GOOD_TIL_CANCELED)
+        time_in_force=GOOD_TIL_CANCELED,
+    )
 
 
 async def cancel_order(
-        exchange: RestExchange,
-        order: Order,
+    exchange: RestExchange,
+    order: Order,
 ) -> None:
-    print(f"Sending cancel for order Id({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
-          f"Size({order.size}), Price({order.price}).")
-    await exchange.cancel_order(
-        symbol=order.symbol,
-        order_id=order.order_id)
+    print(
+        f"Sending cancel for order Id({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
+        f"Size({order.size}), Price({order.price})."
+    )
+    await exchange.cancel_order(symbol=order.symbol, order_id=order.order_id)
