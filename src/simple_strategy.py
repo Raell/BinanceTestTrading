@@ -1,5 +1,4 @@
 import asyncio
-import functools
 import threading
 from asyncio import Future
 from decimal import Decimal
@@ -7,9 +6,10 @@ from typing import List, Tuple
 
 from aiohttp import ClientResponseError
 from cryptofeed.defines import BUY, SELL
-from cryptofeed.exchange import RestExchange
+from cryptofeed.exchanges.mixins.binance_rest import BinanceRestMixin
 from cryptofeed.types import OrderInfo
 
+from sandbox_get_override import cancel_all_orders
 from order import Order, cancel_order, order_from_order_info, send_order
 from state import BookSide, State
 
@@ -19,7 +19,7 @@ EXPECTED_ORDERS_PER_SIDE = 2
 
 
 class SimpleStrategy:
-    def __init__(self, exchange: RestExchange, state: State, balance_limit: float):
+    def __init__(self, exchange: BinanceRestMixin, state: State, balance_limit: float):
         self._exchange = exchange
         self._state = state
         self._balance_limit = balance_limit
@@ -74,6 +74,11 @@ class SimpleStrategy:
         self.__lock.acquire()
         try:
             top_market = self._state.top_market
+            if not top_market:
+                print("Cancelling all orders as book is empty.")
+                cancel_all_orders(self._exchange, self._state.asset)
+                return
+
             best_bid = top_market[BookSide.BID]
             best_ask = top_market[BookSide.ASK]
             open_orders = self._state.open_orders

@@ -1,3 +1,4 @@
+import asyncio
 from typing import Dict
 
 from cryptofeed.defines import DELETE, GET
@@ -18,12 +19,11 @@ async def get_account_info(exchange: BinanceRestMixin) -> Dict[str, str]:
     return data
 
 
-async def cancel_all_orders(exchange: BinanceRestMixin, symbol: str) -> None:
+def cancel_all_orders(exchange: BinanceRestMixin, symbol: str) -> None:
     # Manual implementation of CANCEL ALL for Sandbox API
-    await exchange._request(
+    asyncio.ensure_future(exchange._request(
         DELETE,
         ALL_OPEN_ORDER,
         auth=True,
         api=SANDBOX_REST_API + SANDBOX_REST_ORDER,
-        payload={"symbol": symbol},
-    )
+        payload={"symbol": symbol}))

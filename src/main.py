@@ -65,7 +65,7 @@ def initialize_account_info(exchange: BinanceRestMixin, state: State) -> None:
     balance = get_balance_for_asset(account_info, state.asset)
 
     # Cancels all open orders
-    loop.run_until_complete(cancel_all_orders(exchange, state.asset))
+    cancel_all_orders(exchange, state.asset)
 
     # Initialize balance
     state.initialize_balance(balance)
