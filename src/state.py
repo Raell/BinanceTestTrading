@@ -82,21 +82,6 @@ class State:
         finally:
             self.__lock.release()
 
-    def __update_top_book(self, book_dict: Dict[str, Dict]):
-        if BookKeys.BOOK not in book_dict:
-            self._top_market = {}
-            return
-
-        if BookSide.BID in book_dict[BookKeys.BOOK]:
-            bids = book_dict[BookKeys.BOOK][BookSide.BID]
-            if bids:
-                self._top_market[BookSide.BID] = list(bids.items())[0]
-
-        if BookSide.ASK in book_dict[BookKeys.BOOK]:
-            asks = book_dict[BookKeys.BOOK][BookSide.ASK]
-            if asks:
-                self._top_market[BookSide.ASK] = list(asks.items())[0]
-
     def initialize_balance(self, balance: float) -> None:
         self._balance = balance
 
@@ -120,3 +105,18 @@ class State:
                     pass
         finally:
             self.__lock.release()
+
+    def __update_top_book(self, book_dict: Dict[str, Dict]):
+        if BookKeys.BOOK not in book_dict:
+            self._top_market = {}
+            return
+
+        if BookSide.BID in book_dict[BookKeys.BOOK]:
+            bids = book_dict[BookKeys.BOOK][BookSide.BID]
+            if bids:
+                self._top_market[BookSide.BID] = list(bids.items())[0]
+
+        if BookSide.ASK in book_dict[BookKeys.BOOK]:
+            asks = book_dict[BookKeys.BOOK][BookSide.ASK]
+            if asks:
+                self._top_market[BookSide.ASK] = list(asks.items())[0]
