@@ -204,11 +204,17 @@ class SimpleStrategy:
         try:
             future.result()
         except ClientResponseError:
-            self.__pending_orders.remove(order)
+            try:
+                self.__pending_orders.remove(order)
+            except ValueError:
+                pass
 
     def __order_cancel_callback(self, order: Order, future: Future) -> None:
         # Gracefully handle failed order cancels
         try:
             future.result()
         except ClientResponseError:
-            self.__pending_cancels.remove(order)
+            try:
+                self.__pending_cancels.remove(order)
+            except ValueError:
+                pass
