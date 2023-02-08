@@ -84,7 +84,7 @@ class State:
 
     def __update_top_book(self, book_dict: Dict[str, Dict]):
         if BookKeys.BOOK not in book_dict:
-            self._open_orders = {}
+            self._top_market = {}
             return
 
         if BookSide.BID in book_dict[BookKeys.BOOK]:
