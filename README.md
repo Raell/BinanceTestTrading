@@ -13,14 +13,14 @@ Potential drawbacks include:
 - Order updates are only sent on book updates, if this feed is delayed the orders may be incorrect
 - This pulls all orders on a trade, hence orders lose priority if re-inserted on the same level
 
-###Running the strategy
+### Running the strategy
 - Requires Python 3.8
 - Use `pipenv shell` to enter the virtual environment
 - Run `pipenv sync` to install dependencies
 - Run `python main.py` to run the strategy
 
 
-###For development and testing
+### For development and testing
 - Use `pipenv shell` to enter the virtual environment.
 - Run `pipenv sync --dev` to install dependencies
 - To run the tests, use `pipenv run test`
