@@ -8,7 +8,10 @@ Bids orders are only placed if the current BTC position is <= 1 BTC while asks o
 
 The strategy listens to the feed and updates its quotes based on new information. It maintains an internal expectation of the state of its orders to prevent duplication but is able to reconciles with the feed gracefully if there is a discrepancy.
 
-
+Potential drawbacks include:
+- The open order internal state is only a best guess estimate by tracking post orders and is reconciled only on as it only updated on feed updates
+- Order updates are only sent on book updates, if this feed is delayed the orders may be incorrect
+- This pulls all orders on a trade, hence orders lose priority if re-inserted on the same level
 
 ###Running the strategy
 - Requires Python 3.8
