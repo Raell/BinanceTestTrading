@@ -21,9 +21,12 @@ async def get_account_info(exchange: BinanceRestMixin) -> Dict[str, str]:
 
 def cancel_all_orders(exchange: BinanceRestMixin, symbol: str) -> None:
     # Manual implementation of CANCEL ALL for Sandbox API
-    asyncio.ensure_future(exchange._request(
-        DELETE,
-        ALL_OPEN_ORDER,
-        auth=True,
-        api=SANDBOX_REST_API + SANDBOX_REST_ORDER,
-        payload={"symbol": symbol}))
+    asyncio.ensure_future(
+        exchange._request(
+            DELETE,
+            ALL_OPEN_ORDER,
+            auth=True,
+            api=SANDBOX_REST_API + SANDBOX_REST_ORDER,
+            payload={"symbol": symbol},
+        )
+    )

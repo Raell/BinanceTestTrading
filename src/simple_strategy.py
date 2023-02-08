@@ -9,8 +9,8 @@ from cryptofeed.defines import BUY, SELL
 from cryptofeed.exchanges.mixins.binance_rest import BinanceRestMixin
 from cryptofeed.types import OrderInfo
 
-from sandbox_get_override import cancel_all_orders
 from order import Order, cancel_order, order_from_order_info, send_order
+from sandbox_get_override import cancel_all_orders
 from state import BookSide, State
 
 SIZE = 0.01
@@ -99,18 +99,18 @@ class SimpleStrategy:
                 return
 
             if (
-                    not bid_orders
-                    and self.__bid_enabled
-                    and self.__is_inventory_within_limit(BUY)
+                not bid_orders
+                and self.__bid_enabled
+                and self.__is_inventory_within_limit(BUY)
             ):
                 print("Inserting new bid orders.")
                 orders = self.__create_orders(BUY, best_bid[0])
                 self.__insert_orders(orders)
 
             if (
-                    not ask_orders
-                    and self.__ask_enabled
-                    and self.__is_inventory_within_limit(SELL)
+                not ask_orders
+                and self.__ask_enabled
+                and self.__is_inventory_within_limit(SELL)
             ):
                 print("Inserting new ask orders.")
                 orders = self.__create_orders(SELL, best_ask[0])
@@ -137,7 +137,8 @@ class SimpleStrategy:
             send_order(
                 exchange=self._exchange,
                 order=order,
-                callback=lambda future: self.__order_insert_callback(order, future))
+                callback=lambda future: self.__order_insert_callback(order, future),
+            )
 
     def __create_orders(self, side: str, best_price: Decimal) -> List[Order]:
         next_level_offset = PRICE_OFFSET if side == SELL else -PRICE_OFFSET
@@ -162,10 +163,11 @@ class SimpleStrategy:
                 cancel_order(
                     exchange=self._exchange,
                     order=order,
-                    callback=lambda future: self.__order_cancel_callback(order, future))
+                    callback=lambda future: self.__order_cancel_callback(order, future),
+                )
 
     def __should_orders_be_pulled(
-            self, side: str, open_orders: List[Order], top_level: Tuple[Decimal, Decimal]
+        self, side: str, open_orders: List[Order], top_level: Tuple[Decimal, Decimal]
     ) -> bool:
         if not open_orders:
             return False
@@ -188,7 +190,7 @@ class SimpleStrategy:
 
     @staticmethod
     def __order_exists_at_top_level_and_not_alone(
-            open_orders: List[Order], top_level: Tuple[Decimal, Decimal]
+        open_orders: List[Order], top_level: Tuple[Decimal, Decimal]
     ) -> bool:
         # Checks if top level is empty
         if not top_level:

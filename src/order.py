@@ -68,29 +68,34 @@ def order_from_order_info(order_info: OrderInfo) -> Order:
     )
 
 
-def send_order(exchange: RestExchange, order: Order, callback: Callable[[Future], None]) -> None:
+def send_order(
+    exchange: RestExchange, order: Order, callback: Callable[[Future], None]
+) -> None:
     print(
         f"Sending order for Symbol({order.symbol}), Side({order.side}), "
         f"Size({float(order.size)}), Price({order.price})."
     )
-    task = asyncio.ensure_future(exchange.place_order(
-        symbol=order.symbol,
-        side=order.side,
-        order_type=LIMIT,
-        amount=float(order.size),
-        price=order.price,
-        time_in_force=GOOD_TIL_CANCELED))
+    task = asyncio.ensure_future(
+        exchange.place_order(
+            symbol=order.symbol,
+            side=order.side,
+            order_type=LIMIT,
+            amount=float(order.size),
+            price=order.price,
+            time_in_force=GOOD_TIL_CANCELED,
+        )
+    )
     task.add_done_callback(callback)
 
 
 def cancel_order(
-    exchange: RestExchange,
-    order: Order,
-    callback: Callable[[Future], None]
+    exchange: RestExchange, order: Order, callback: Callable[[Future], None]
 ) -> None:
     print(
         f"Sending cancel for order Id({order.order_id}), Symbol({order.symbol}), Side({order.side}), "
         f"Size({order.size}), Price({order.price})."
     )
-    task = asyncio.ensure_future(exchange.cancel_order(symbol=order.symbol, order_id=order.order_id))
+    task = asyncio.ensure_future(
+        exchange.cancel_order(symbol=order.symbol, order_id=order.order_id)
+    )
     task.add_done_callback(callback)

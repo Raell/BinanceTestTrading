@@ -1,9 +1,9 @@
 from decimal import Decimal
-
-import pytest
 from unittest.mock import Mock, patch
 
-from state import State, BookSide, BookKeys
+import pytest
+
+from state import BookKeys, BookSide, State
 
 
 @pytest.fixture
@@ -16,16 +16,14 @@ def state(symbol):
     return State(symbol, "BTC")
 
 
-def test_book_update(
-        symbol: str,
-        state: State) -> None:
+def test_book_update(symbol: str, state: State) -> None:
     book = Mock()
     book.symbol = symbol
     book.to_dict = Mock()
     book.to_dict.return_value = {
         BookKeys.BOOK: {
             BookSide.BID: {Decimal(1): Decimal(1)},
-            BookSide.ASK: {Decimal(2): Decimal(1)}
+            BookSide.ASK: {Decimal(2): Decimal(1)},
         }
     }
 
@@ -35,25 +33,19 @@ def test_book_update(
     assert state.top_market[BookSide.ASK] == (Decimal(2), Decimal(1))
 
 
-def test_balance_initialization(
-        symbol: str,
-        state: State) -> None:
+def test_balance_initialization(symbol: str, state: State) -> None:
     assert state.balance == 0
     state.initialize_balance(1)
     assert state.balance == 1
 
 
-def test_balance_initialization(
-        symbol: str,
-        state: State) -> None:
+def test_balance_initialization(symbol: str, state: State) -> None:
     assert state.balance == 0
     state.initialize_balance(1)
     assert state.balance == 1
 
 
-def test_handle_positions(
-        symbol: str,
-        state: State) -> None:
+def test_handle_positions(symbol: str, state: State) -> None:
     positions = Mock()
     positions.position = 1
     assert state.balance == 0
@@ -61,11 +53,8 @@ def test_handle_positions(
     assert state.balance == 1
 
 
-@patch('state.order_from_order_info')
-def test_handle_new_order_info(
-        mock_converter: Mock,
-        symbol: str,
-        state: State) -> None:
+@patch("state.order_from_order_info")
+def test_handle_new_order_info(mock_converter: Mock, symbol: str, state: State) -> None:
     order = Mock()
     order_info = Mock()
     order_info.status = "NEW"
@@ -75,11 +64,10 @@ def test_handle_new_order_info(
     assert order in state.open_orders
 
 
-@patch('state.order_from_order_info')
+@patch("state.order_from_order_info")
 def test_handle_trade_order_info(
-        mock_converter: Mock,
-        symbol: str,
-        state: State) -> None:
+    mock_converter: Mock, symbol: str, state: State
+) -> None:
     order = Mock()
     order_info_1 = Mock()
     order_info_1.status = "NEW"
@@ -94,11 +82,10 @@ def test_handle_trade_order_info(
     assert order not in state.open_orders
 
 
-@patch('state.order_from_order_info')
+@patch("state.order_from_order_info")
 def test_handle_cancel_order_info(
-        mock_converter: Mock,
-        symbol: str,
-        state: State) -> None:
+    mock_converter: Mock, symbol: str, state: State
+) -> None:
     order = Mock()
     order_info_1 = Mock()
     order_info_1.status = "NEW"
