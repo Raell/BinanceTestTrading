@@ -19,6 +19,7 @@ Potential drawbacks include:
 - Requires Python 3.8
 - Use `pipenv shell` to enter the virtual environment
 - Run `pipenv sync` to install dependencies
+- Set exchange `key_id` and `key_secret` in `config.yaml`
 - Run `python main.py` to run the strategy
 
 
